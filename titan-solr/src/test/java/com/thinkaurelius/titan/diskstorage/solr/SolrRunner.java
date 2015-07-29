@@ -13,7 +13,7 @@ public class SolrRunner {
     protected static final int NUM_SERVERS = 1;
     protected static final String[] COLLECTIONS = new String[] { "store1", "store2", "vertex", "edge", "namev", "namee",
             "composite", "psearch", "esearch", "vsearch", "mi", "mixed", "index1", "index2", "index3",
-            "ecategory", "vcategory", "pcategory", "theIndex", "vertices", "edges" };
+            "ecategory", "vcategory", "pcategory", "theIndex", "vertices", "edges", "booleanIndex", "dateIndex", "uuidIndex" };
 
     protected static final String[] KEY_FIELDS = new String[0];
 
@@ -39,13 +39,13 @@ public class SolrRunner {
         temp.deleteOnExit();
 
         File solrXml = new File(solrHome, "solr.xml");
-        miniSolrCloudCluster = new MiniSolrCloudCluster(NUM_SERVERS, null, solrXml, null, null);
+        miniSolrCloudCluster = new MiniSolrCloudCluster(NUM_SERVERS, null, temp, solrXml, null, null);
 
         for (String core : COLLECTIONS) {
             File coreDirectory = new File(temp.getAbsolutePath() + File.separator + core);
             assert coreDirectory.mkdirs();
             FileUtils.copyDirectory(templateDirectory, coreDirectory);
-            uploadConfigDirToZk(core, coreDirectory.getAbsolutePath());
+            miniSolrCloudCluster.uploadConfigDir(coreDirectory.getAbsoluteFile(), core);
         }
     }
 
@@ -65,8 +65,5 @@ public class SolrRunner {
         return dispatchFilter.getCores().getZkController();
     }
 
-    protected static void uploadConfigDirToZk(String coreName, String collectionConfigDir) throws Exception {
-        ZkController zkController = getZkController();
-        zkController.uploadConfigDir(new File(collectionConfigDir), coreName);
-    }
+
 }
