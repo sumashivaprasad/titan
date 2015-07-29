@@ -150,6 +150,7 @@ public class SolrIndex implements IndexProvider {
     private final Map<String, String> keyFieldIds;
     private final String ttlField;
     private final int maxResults;
+    private final boolean waitSearcher;
 
     public SolrIndex(final Configuration config) throws BackendException {
         Preconditions.checkArgument(config!=null);
@@ -160,6 +161,7 @@ public class SolrIndex implements IndexProvider {
         keyFieldIds = parseKeyFieldsForCollections(config);
         maxResults = config.get(INDEX_MAX_RESULT_SET_SIZE);
         ttlField = config.get(TTL_FIELD);
+        waitSearcher = config.get(WAIT_SEARCHER);
 
         if (mode==Mode.CLOUD) {
             String zookeeperUrl = config.get(SolrIndex.ZOOKEEPER_URL);
@@ -819,10 +821,12 @@ public class SolrIndex implements IndexProvider {
         return map;
     }
 
-    private static UpdateRequest newUpdateRequest() {
+    private UpdateRequest newUpdateRequest() {
         UpdateRequest req = new UpdateRequest();
         req.setAction(UpdateRequest.ACTION.COMMIT, true, true);
-        return req;
+        if (waitSearcher) {
+            req.setAction(UpdateRequest.ACTION.COMMIT, true, true);
+        }
     }
 
     private BackendException storageException(Exception solrException) {
