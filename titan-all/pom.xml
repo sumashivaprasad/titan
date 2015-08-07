@@ -63,11 +63,12 @@
             <artifactId>titan-es</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+       <!-- Commenting out titan-solr since we bumped up solr but lucene is still 4.8.1-->
+       <!-- <dependency>
             <groupId>com.thinkaurelius.titan</groupId>
             <artifactId>titan-solr</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.thinkaurelius.titan</groupId>
             <artifactId>titan-lucene</artifactId>
